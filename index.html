@@ -4,754 +4,1323 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Inchara M — Portfolio</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=JetBrains+Mono:wght@300;400;500&family=Outfit:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --gold:#f5c842;--gold2:#e8a020;--white:#f5f0ea;--muted:#9a9080;
-  --teal:#3ecfb2;--bg:#07070f;--saffron:#ff6b1a;--blue:#1a3a8a;
-  --serif:'Playfair Display',Georgia,serif;
-  --mono:'JetBrains Mono',monospace;
-  --sans:'Outfit',sans-serif;
-}
-html{scroll-behavior:smooth}
-body{font-family:var(--sans);background:var(--bg);color:var(--white);overflow-x:hidden;cursor:none}
-#cur{position:fixed;width:10px;height:10px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:difference}
-#cur2{position:fixed;width:34px;height:34px;border:1px solid rgba(245,200,66,.4);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%)}
+  :root {
+    --bg: #060818;
+    --bg2: #0a0f2a;
+    --gold: #f5c842;
+    --gold2: #ffaa00;
+    --saffron: #ff6b2b;
+    --deep-orange: #e84a1a;
+    --violet: #7c3aed;
+    --violet-light: #a855f7;
+    --white: #f0eaff;
+    --muted: #8a8eb8;
+    --card: rgba(255,255,255,0.04);
+    --border: rgba(245,200,66,0.15);
+  }
 
-/* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.4rem 4rem;transition:all .4s}
-nav.scrolled{background:rgba(7,7,15,.85);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05)}
-.nav-logo{font-family:var(--mono);font-size:.9rem;color:var(--white);text-decoration:none;letter-spacing:.06em}
-.nav-logo span{color:var(--gold)}
-.nav-links{display:flex;gap:2.5rem;list-style:none}
-.nav-links a{font-size:.75rem;font-weight:500;color:rgba(255,255,255,.45);text-decoration:none;letter-spacing:.1em;text-transform:uppercase;transition:color .2s}
-.nav-links a:hover{color:var(--gold)}
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* ===== HERO ===== */
-#hero{position:relative;width:100%;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:space-between;padding:0 5vw}
+  html { scroll-behavior: smooth; }
 
-/* starfield */
-#star-canvas{position:absolute;inset:0;z-index:0}
-/* three.js bokeh */
-#bokeh-canvas{position:absolute;inset:0;z-index:1;pointer-events:none}
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+  }
 
-/* mahadev divine bg glow */
-.divine-glow{
-  position:absolute;top:0;right:0;width:55%;height:100%;z-index:0;
-  background:radial-gradient(ellipse at 70% 40%, rgba(255,107,26,.06) 0%, rgba(245,200,66,.04) 30%, transparent 70%);
-  pointer-events:none;
-}
-.divine-glow2{
-  position:absolute;inset:0;z-index:0;
-  background:radial-gradient(ellipse at 30% 50%, rgba(26,58,138,.08) 0%, transparent 60%);
-  pointer-events:none;
-}
+  /* ===== CANVAS STARFIELD ===== */
+  #starCanvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
 
-/* overlays */
-.ov-grad{position:absolute;inset:0;z-index:2;pointer-events:none;
-  background:
-    linear-gradient(to right,rgba(7,7,15,.9) 0%,rgba(7,7,15,.35) 50%,rgba(7,7,15,.6) 100%),
-    linear-gradient(to top,rgba(7,7,15,1) 0%,transparent 40%),
-    linear-gradient(to bottom,rgba(7,7,15,.5) 0%,transparent 18%);
-}
+  /* ===== FLOATING PARTICLES ===== */
+  .particle {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1;
+    animation: floatParticle linear infinite;
+  }
 
-/* ===== MAHADEV SCENE (right side) ===== */
-.mahadev-scene{
-  position:absolute;right:0;top:0;bottom:0;width:58%;z-index:3;
-  display:flex;align-items:flex-end;justify-content:center;
-  pointer-events:none;
-}
-.scene-svg{width:100%;height:100%}
+  @keyframes floatParticle {
+    0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 0.6; }
+    100% { transform: translateY(-100px) rotate(720deg); opacity: 0; }
+  }
 
-/* OM glow pulse */
-.om-glow{animation:om-pulse 3s ease-in-out infinite}
-@keyframes om-pulse{0%,100%{opacity:.6;filter:blur(0px)}50%{opacity:1;filter:blur(1px)}}
-/* trishul shimmer */
-.trishul-shine{animation:tshine 4s ease-in-out infinite}
-@keyframes tshine{0%,100%{opacity:.7}50%{opacity:1}}
-/* lamp flicker */
-.lamp-flame{animation:flicker 1.5s ease-in-out infinite}
-@keyframes flicker{0%,100%{transform:scaleY(1) translateX(0)}25%{transform:scaleY(1.15) translateX(1px)}75%{transform:scaleY(.9) translateX(-1px)}}
-/* laptop screen pulse */
-.screen-pulse{animation:scpulse 3s ease-in-out infinite}
-@keyframes scpulse{0%,100%{opacity:.85}50%{opacity:1}}
-/* code lines */
-.cl1{animation:cla 2.5s linear infinite}
-.cl2{animation:cla 2.5s .8s linear infinite}
-.cl3{animation:cla 2.5s 1.6s linear infinite}
-@keyframes cla{0%{opacity:0;transform:translateY(4px)}15%{opacity:1;transform:none}85%{opacity:1}100%{opacity:0}}
-.curs{animation:cblink 1s step-end infinite}
-@keyframes cblink{0%,100%{opacity:1}50%{opacity:0}}
-/* flower petals float */
-.petal{animation:petalfall linear infinite}
-.p1{animation-duration:6s;animation-delay:0s}
-.p2{animation-duration:8s;animation-delay:2s}
-.p3{animation-duration:7s;animation-delay:4s}
-.p4{animation-duration:9s;animation-delay:1s}
-.p5{animation-duration:6.5s;animation-delay:3s}
-@keyframes petalfall{0%{transform:translateY(-20px) rotate(0deg);opacity:0}10%{opacity:.8}90%{opacity:.4}100%{transform:translateY(60px) rotate(360deg);opacity:0}}
-/* divine light rays */
-.ray{animation:rayshine 4s ease-in-out infinite;transform-origin:center bottom}
-.r1{animation-delay:0s}.r2{animation-delay:.5s}.r3{animation-delay:1s}.r4{animation-delay:1.5s}.r5{animation-delay:2s}
-@keyframes rayshine{0%,100%{opacity:.04}50%{opacity:.12}}
-/* rudrakshas rotate */
-.rudraksha-chain{animation:chainflow 8s linear infinite}
-@keyframes chainflow{0%{transform:translateY(0)}50%{transform:translateY(4px)}100%{transform:translateY(0)}}
+  /* ===== NAV ===== */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 1.2rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(6,8,24,0.8);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
 
-/* ===== HERO LEFT TEXT ===== */
-.hero-left{position:relative;z-index:10;max-width:500px}
-.otw{display:inline-flex;align-items:center;gap:.5rem;border:1px solid rgba(62,207,178,.4);padding:.3rem 1rem;font-family:var(--mono);font-size:.67rem;letter-spacing:.14em;color:var(--teal);text-transform:uppercase;margin-bottom:1.2rem;opacity:0}
-.otw-dot{width:5px;height:5px;background:var(--teal);border-radius:50%;animation:blink 1.4s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.1}}
-.hero-fn{font-family:var(--serif);font-size:clamp(4rem,9vw,9rem);font-weight:900;font-style:italic;color:var(--gold);line-height:.9;letter-spacing:-.02em;text-shadow:0 0 80px rgba(245,200,66,.2);display:block;transform:translateY(100%)}
-.hero-ln{display:block;font-family:var(--mono);font-size:clamp(.85rem,1.8vw,1.3rem);font-weight:300;letter-spacing:.5em;color:rgba(245,240,234,.4);text-transform:uppercase;margin-top:.4rem;opacity:0;transform:translateY(20px)}
-.hero-role{font-family:var(--sans);font-size:.92rem;color:rgba(245,240,234,.55);line-height:1.7;margin:1.4rem 0 2rem;opacity:0;transform:translateY(20px)}
-.hero-role strong{color:var(--white);font-weight:600}
-.hero-ctas{display:flex;gap:1rem;flex-wrap:wrap;opacity:0;transform:translateY(20px)}
-.btn-p{display:inline-flex;align-items:center;gap:.5rem;padding:.82rem 2rem;background:var(--gold);color:#07070f;font-family:var(--sans);font-size:.8rem;font-weight:700;letter-spacing:.08em;text-decoration:none;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));transition:all .25s;cursor:none}
-.btn-p:hover{background:var(--gold2);transform:translateY(-3px);box-shadow:0 8px 25px rgba(245,200,66,.25)}
-.btn-g{display:inline-flex;align-items:center;gap:.5rem;padding:.82rem 2rem;background:rgba(255,255,255,.06);backdrop-filter:blur(10px);color:var(--white);font-family:var(--sans);font-size:.8rem;font-weight:400;letter-spacing:.08em;text-decoration:none;border:1px solid rgba(255,255,255,.14);transition:all .25s;cursor:none}
-.btn-g:hover{border-color:var(--gold);color:var(--gold)}
+  .nav-logo {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.2rem;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-shadow: 0 0 20px rgba(245,200,66,0.5);
+  }
 
-/* scroll indicator */
-.scroll-ind{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);z-index:10;display:flex;flex-direction:column;align-items:center;gap:.5rem;cursor:none;opacity:0}
-.scroll-txt{font-family:var(--mono);font-size:.58rem;letter-spacing:.18em;color:rgba(255,255,255,.3);text-transform:uppercase}
-.scroll-ln{width:1px;height:44px;background:linear-gradient(to bottom,rgba(245,200,66,.6),transparent);position:relative;overflow:hidden}
-.scroll-ln::after{content:'';position:absolute;top:-100%;left:0;width:100%;height:100%;background:linear-gradient(to bottom,transparent,var(--gold),transparent);animation:scroll-p 2s ease-in-out infinite}
-@keyframes scroll-p{0%{top:-100%}100%{top:200%}}
+  .nav-links { display: flex; gap: 2.5rem; }
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--gold); }
 
-/* ===== QUOTE ===== */
-#quote{position:relative;z-index:10;padding:6rem 2rem;text-align:center;overflow:hidden}
-#quote::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(255,107,26,.06) 0%,rgba(245,200,66,.04) 30%,transparent 70%);pointer-events:none}
-.q-om{font-size:3rem;display:block;margin-bottom:1rem;opacity:.25;animation:om-pulse 3s infinite}
-.q-main{font-family:var(--serif);font-size:clamp(2.2rem,5vw,5rem);font-style:italic;font-weight:900;color:var(--gold);line-height:1.08;max-width:900px;margin:0 auto 1.5rem;text-shadow:0 0 60px rgba(245,200,66,.18)}
-.q-attr{font-family:var(--mono);font-size:.72rem;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
-.q-line{display:block;width:50px;height:1px;background:var(--gold);margin:.8rem auto 0;opacity:.3}
+  /* ===== MAIN WRAPPER ===== */
+  main { position: relative; z-index: 2; }
 
-/* ===== SECTIONS ===== */
-.section{position:relative;z-index:10;max-width:1100px;margin:0 auto;padding:5.5rem 4rem}
-.sl{font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;color:var(--gold);text-transform:uppercase;margin-bottom:.5rem;display:flex;align-items:center;gap:.6rem}
-.sl::before{content:'';display:block;width:18px;height:1px;background:var(--gold)}
-.st{font-family:var(--serif);font-size:clamp(1.8rem,3vw,2.8rem);margin-bottom:2.5rem;font-weight:700}
-.st em{font-style:italic;color:var(--gold)}
-.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
-.atp{font-size:.92rem;color:rgba(245,240,234,.6);line-height:1.85;margin-bottom:1rem}
-.sg{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
-.sc{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);padding:1.5rem;position:relative;overflow:hidden;transition:all .3s}
-.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .3s}
-.sc:hover::before{transform:scaleX(1)}
-.sc:hover{border-color:rgba(245,200,66,.3);transform:translateY(-3px)}
-.sn{font-family:var(--serif);font-size:2.8rem;color:var(--gold);line-height:1;font-weight:900}
-.sl2{font-family:var(--mono);font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:.3rem}
-.skrows{display:flex;flex-direction:column;gap:.8rem}
-.skrow{display:flex;align-items:center;gap:1.5rem;padding:1rem 1.5rem;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);transition:all .25s}
-.skrow:hover{background:rgba(245,200,66,.05);border-color:rgba(245,200,66,.2)}
-.skcat{font-family:var(--mono);font-size:.62rem;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;min-width:130px;flex-shrink:0}
-.skpp{display:flex;flex-wrap:wrap;gap:.4rem}
-.pill{background:rgba(255,255,255,.05);color:rgba(245,240,234,.65);font-size:.72rem;padding:.2rem .65rem;border:1px solid rgba(255,255,255,.07);font-family:var(--mono);transition:all .2s}
-.pill:hover{background:rgba(245,200,66,.12);color:var(--gold);border-color:rgba(245,200,66,.3)}
-.pg{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
-.pc{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);padding:2rem;position:relative;overflow:hidden;transition:transform .3s,border-color .3s}
-.pc::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(245,200,66,.04),transparent);opacity:0;transition:opacity .3s}
-.pc:hover::after{opacity:1}
-.pc:hover{transform:translateY(-5px);border-color:rgba(245,200,66,.25)}
-.pc.w{grid-column:span 2}
-.pb{display:inline-block;font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;padding:.2rem .7rem;margin-bottom:1.2rem}
-.bl{background:rgba(62,207,178,.1);color:var(--teal);border:1px solid rgba(62,207,178,.25)}
-.bd{background:rgba(245,200,66,.1);color:var(--gold);border:1px solid rgba(245,200,66,.25)}
-.bk{background:rgba(255,255,255,.05);color:var(--muted);border:1px solid rgba(255,255,255,.1)}
-.bm{background:rgba(155,127,232,.1);color:#b89fe8;border:1px solid rgba(155,127,232,.25)}
-.ptt{font-family:var(--serif);font-size:1.35rem;color:var(--white);margin-bottom:.4rem;line-height:1.25}
-.pst{font-family:var(--mono);font-size:.65rem;color:var(--muted);margin-bottom:1rem}
-.pde{font-size:.85rem;color:rgba(245,240,234,.6);line-height:1.7}
-.pde li{margin-bottom:.3rem;margin-left:1rem}
-.plnk{display:inline-flex;align-items:center;gap:.4rem;margin-top:1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.08em;color:var(--gold);text-decoration:none;text-transform:uppercase;transition:gap .2s}
-.plnk:hover{gap:.8rem}
-.awl{display:flex;flex-direction:column;gap:1px;background:rgba(255,255,255,.06)}
-.awr{display:flex;align-items:center;gap:2rem;padding:2rem;background:var(--bg);border-left:3px solid transparent;transition:all .25s}
-.awr:hover{background:rgba(255,255,255,.025);border-left-color:var(--gold)}
-.awn{font-family:var(--serif);font-size:3.5rem;color:rgba(255,255,255,.04);line-height:1;min-width:4.5rem;font-weight:900}
-.awi{font-size:2rem;flex-shrink:0}
-.awt{font-weight:600;font-size:1rem;color:var(--white);margin-bottom:.3rem}
-.awd{font-size:.82rem;color:var(--muted)}
-.cg{display:grid;grid-template-columns:1.3fr 1fr;gap:4rem;align-items:start}
-.cbig{font-family:var(--serif);font-size:clamp(2.5rem,5vw,4rem);line-height:1.1;margin-bottom:1rem;font-weight:900}
-.cbig em{font-style:italic;color:var(--gold)}
-.csub{font-size:.92rem;color:rgba(245,240,234,.55);line-height:1.8;margin-bottom:2.5rem}
-.cll{display:flex;flex-direction:column;gap:.6rem}
-.cl{display:flex;align-items:center;gap:1rem;padding:.9rem 1.2rem;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);color:var(--white);text-decoration:none;transition:all .25s;cursor:none}
-.cl:hover{border-color:var(--gold);background:rgba(245,200,66,.06)}
-.cl-ic{width:36px;height:36px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
-.cl-lb{font-family:var(--mono);font-size:.62rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:2px}
-.cl-vl{font-size:.85rem;font-weight:500}
-.acs{display:flex;flex-direction:column;gap:1rem}
-.ac{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);padding:1.3rem}
-.acl{font-family:var(--mono);font-size:.62rem;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.8rem}
-.aci{font-size:.83rem;color:rgba(245,240,234,.6);padding:.3rem 0;border-bottom:1px solid rgba(255,255,255,.04);line-height:1.5}
-.aci:last-child{border-bottom:none}
-.aci strong{color:var(--white);font-weight:500}
-.divider{max-width:1100px;margin:0 auto;padding:0 4rem;border-bottom:1px solid rgba(255,255,255,.05)}
-footer{text-align:center;padding:2.5rem 4rem;border-top:1px solid rgba(255,255,255,.05);font-family:var(--mono);font-size:.65rem;color:var(--muted);letter-spacing:.08em}
-footer a{color:var(--gold);text-decoration:none}
-.rev{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
-.rev.on{opacity:1;transform:translateY(0)}
-.rev[data-d="1"]{transition-delay:.1s}.rev[data-d="2"]{transition-delay:.2s}.rev[data-d="3"]{transition-delay:.3s}.rev[data-d="4"]{transition-delay:.4s}
-@media(max-width:900px){
-  nav{padding:1rem 1.5rem}.nav-links{display:none}
-  #hero{flex-direction:column;align-items:center;justify-content:center;padding:6rem 1.5rem 4rem}
-  .hero-left{text-align:center;max-width:100%}
-  .hero-ctas{justify-content:center}
-  .mahadev-scene{display:none}
-  .section{padding:3.5rem 1.5rem}
-  .about-grid,.pg,.cg{grid-template-columns:1fr}
-  .pc.w{grid-column:span 1}
-}
+  /* ===== HERO ===== */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6rem 2rem 4rem;
+    position: relative;
+  }
+
+  /* MANDALA background */
+  .mandala-bg {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 700px; height: 700px;
+    opacity: 0.06;
+    animation: rotateMandala 60s linear infinite;
+    pointer-events: none;
+  }
+
+  @keyframes rotateMandala {
+    from { transform: translate(-50%,-50%) rotate(0deg); }
+    to { transform: translate(-50%,-50%) rotate(360deg); }
+  }
+
+  /* TRISHUL */
+  .trishul-container {
+    position: relative;
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .trishul-svg {
+    width: 90px;
+    filter: drop-shadow(0 0 20px var(--gold)) drop-shadow(0 0 40px var(--saffron));
+    animation: trishulPulse 3s ease-in-out infinite;
+  }
+
+  @keyframes trishulPulse {
+    0%, 100% { filter: drop-shadow(0 0 15px var(--gold)) drop-shadow(0 0 35px var(--saffron)); transform: scale(1); }
+    50% { filter: drop-shadow(0 0 30px var(--gold)) drop-shadow(0 0 60px var(--saffron)) drop-shadow(0 0 80px var(--gold2)); transform: scale(1.05); }
+  }
+
+  .om-symbol {
+    font-size: 1.4rem;
+    color: var(--gold);
+    margin-top: 0.5rem;
+    letter-spacing: 4px;
+    opacity: 0.7;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--saffron);
+    margin-bottom: 1rem;
+    opacity: 0.9;
+  }
+
+  h1 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(2.8rem, 8vw, 6rem);
+    font-weight: 900;
+    line-height: 1.05;
+    background: linear-gradient(135deg, var(--gold) 0%, #fff5cc 40%, var(--gold2) 60%, var(--saffron) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.6rem;
+    text-shadow: none;
+    animation: shimmerText 4s ease-in-out infinite;
+    background-size: 200% 200%;
+  }
+
+  @keyframes shimmerText {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .hero-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(0.9rem, 2.5vw, 1.3rem);
+    letter-spacing: 4px;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+  }
+
+  .hero-quote {
+    font-style: italic;
+    color: var(--gold);
+    font-size: 0.95rem;
+    opacity: 0.75;
+    margin-bottom: 2.5rem;
+    max-width: 500px;
+  }
+
+  .hero-ctas {
+    display: flex;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn-primary {
+    padding: 0.85rem 2.5rem;
+    background: linear-gradient(135deg, var(--gold2), var(--saffron));
+    color: #0a0205;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 50px;
+    transition: all 0.3s;
+    box-shadow: 0 4px 30px rgba(255,107,43,0.4);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 40px rgba(255,107,43,0.6);
+  }
+
+  .btn-outline {
+    padding: 0.85rem 2.5rem;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 50px;
+    transition: all 0.3s;
+  }
+
+  .btn-outline:hover {
+    background: rgba(245,200,66,0.1);
+    transform: translateY(-3px);
+  }
+
+  /* SCROLL INDICATOR */
+  .scroll-indicator {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--muted);
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    animation: scrollBounce 2s ease-in-out infinite;
+  }
+
+  @keyframes scrollBounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(8px); }
+  }
+
+  .scroll-indicator::after {
+    content: '';
+    display: block;
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+  }
+
+  /* ===== SECTION STYLES ===== */
+  section {
+    padding: 6rem 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  .section-eyebrow {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--saffron);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .section-eyebrow::before,
+  .section-eyebrow::after {
+    content: '';
+    width: 40px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--saffron));
+  }
+  .section-eyebrow::after { background: linear-gradient(to left, transparent, var(--saffron)); }
+
+  h2 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    background: linear-gradient(135deg, var(--gold), var(--white));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ===== ABOUT ===== */
+  #about {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 4rem;
+    align-items: center;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  .about-visual {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .avatar-ring {
+    position: relative;
+    width: 220px;
+    height: 220px;
+  }
+
+  .avatar-ring::before {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, var(--saffron), var(--gold), var(--violet-light), var(--saffron));
+    animation: spinRing 4s linear infinite;
+  }
+
+  @keyframes spinRing {
+    to { transform: rotate(360deg); }
+  }
+
+  .avatar-inner {
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    background: var(--bg2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 4rem;
+    color: var(--gold);
+    text-shadow: 0 0 30px rgba(245,200,66,0.6);
+    z-index: 1;
+  }
+
+  .stat-chips {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    width: 100%;
+  }
+
+  .chip {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.8rem 1.2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+  }
+
+  .chip-label { color: var(--muted); }
+  .chip-value { color: var(--gold); font-weight: 600; font-family: 'Cinzel', serif; }
+
+  .about-text p {
+    color: #b8bcde;
+    line-height: 1.9;
+    font-size: 0.95rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .about-text p strong { color: var(--gold); }
+
+  /* ===== SKILLS ===== */
+  #skills { background: linear-gradient(180deg, transparent 0%, rgba(124,58,237,0.04) 50%, transparent 100%); }
+
+  .skills-cosmos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .skill-planet {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 1.8rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s;
+  }
+
+  .skill-planet::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -30%;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    opacity: 0.06;
+    transition: all 0.4s;
+  }
+
+  .skill-planet:nth-child(1)::before { background: var(--gold); }
+  .skill-planet:nth-child(2)::before { background: var(--saffron); }
+  .skill-planet:nth-child(3)::before { background: var(--violet-light); }
+  .skill-planet:nth-child(4)::before { background: #00d4aa; }
+  .skill-planet:nth-child(5)::before { background: #e84a1a; }
+
+  .skill-planet:hover {
+    transform: translateY(-6px);
+    border-color: rgba(245,200,66,0.4);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+
+  .skill-planet:hover::before { opacity: 0.12; transform: scale(1.2); }
+
+  .planet-icon {
+    font-size: 2rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .planet-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--saffron);
+    margin-bottom: 1rem;
+  }
+
+  .skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .tag {
+    padding: 0.3rem 0.9rem;
+    border-radius: 50px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--white);
+    transition: all 0.3s;
+  }
+
+  .tag:hover {
+    background: rgba(245,200,66,0.15);
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  /* ===== PROJECTS ===== */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.8rem;
+  }
+
+  .project-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s;
+    cursor: default;
+  }
+
+  .project-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--saffron), var(--gold));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s;
+  }
+
+  .project-card:hover::after { transform: scaleX(1); }
+
+  .project-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(245,200,66,0.3);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+  }
+
+  .project-number {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 3rem;
+    color: rgba(245,200,66,0.08);
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    line-height: 1;
+    user-select: none;
+  }
+
+  .project-icon { font-size: 1.8rem; margin-bottom: 1rem; }
+
+  .project-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.05rem;
+    color: var(--white);
+    margin-bottom: 0.5rem;
+  }
+
+  .project-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+  }
+
+  .stack-tag {
+    padding: 0.2rem 0.7rem;
+    border-radius: 50px;
+    font-size: 0.72rem;
+    background: rgba(255,107,43,0.12);
+    border: 1px solid rgba(255,107,43,0.3);
+    color: var(--saffron);
+  }
+
+  .project-desc {
+    color: #8a8eb8;
+    font-size: 0.88rem;
+    line-height: 1.7;
+  }
+
+  /* ===== AWARDS ===== */
+  .awards-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .award-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2rem;
+    display: flex;
+    gap: 1.2rem;
+    align-items: flex-start;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .award-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(245,200,66,0.06), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .award-card:hover { transform: translateY(-5px); }
+  .award-card:hover::before { opacity: 1; }
+
+  .award-icon {
+    font-size: 2.5rem;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 10px var(--gold));
+  }
+
+  .award-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    color: var(--gold);
+    margin-bottom: 0.4rem;
+  }
+
+  .award-desc { color: var(--muted); font-size: 0.87rem; line-height: 1.6; }
+
+  /* ===== CERTIFICATIONS ===== */
+  .cert-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+    justify-content: center;
+  }
+
+  .cert-badge {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.2rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    transition: all 0.3s;
+  }
+
+  .cert-badge:hover {
+    border-color: rgba(245,200,66,0.4);
+    background: rgba(245,200,66,0.05);
+    transform: translateY(-3px);
+  }
+
+  .cert-badge .icon { font-size: 1.5rem; }
+  .cert-badge .text { font-size: 0.88rem; color: var(--white); }
+  .cert-badge .issuer { font-size: 0.75rem; color: var(--muted); }
+
+  /* ===== CONTACT ===== */
+  #contact {
+    text-align: center;
+    padding-bottom: 8rem;
+  }
+
+  .contact-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2.5rem;
+  }
+
+  .contact-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 0.8rem 1.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    text-decoration: none;
+    color: var(--white);
+    font-size: 0.88rem;
+    transition: all 0.3s;
+  }
+
+  .contact-item:hover {
+    border-color: var(--gold);
+    background: rgba(245,200,66,0.08);
+    color: var(--gold);
+    transform: translateY(-3px);
+  }
+
+  /* ===== DIVIDER ===== */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    opacity: 0.3;
+  }
+
+  .divider-line { flex: 1; height: 1px; background: linear-gradient(to right, transparent, var(--gold), transparent); }
+  .divider-symbol { color: var(--gold); font-size: 1.2rem; }
+
+  /* ===== FOOTER ===== */
+  footer {
+    text-align: center;
+    padding: 3rem 2rem;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    position: relative;
+    z-index: 2;
+  }
+
+  footer .footer-symbol {
+    font-size: 1.5rem;
+    color: var(--gold);
+    display: block;
+    margin-bottom: 0.5rem;
+    filter: drop-shadow(0 0 8px var(--gold));
+  }
+
+  /* ===== SHOOTING STARS ===== */
+  .shooting-star {
+    position: fixed;
+    width: 2px;
+    height: 80px;
+    background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 1;
+    animation: shootingStar linear infinite;
+    opacity: 0;
+  }
+
+  @keyframes shootingStar {
+    0% { transform: translateX(0) translateY(0) rotate(45deg); opacity: 0; }
+    5% { opacity: 1; }
+    60% { opacity: 0; }
+    100% { transform: translateX(800px) translateY(800px) rotate(45deg); opacity: 0; }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { gap: 1.2rem; }
+    .nav-links a { font-size: 0.75rem; }
+    .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .about-visual { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+  }
 </style>
 </head>
 <body>
-<div id="cur"></div><div id="cur2"></div>
 
-<nav id="nav">
-  <a class="nav-logo" href="#">inchara<span>.</span>m</a>
-  <ul class="nav-links">
-    <li><a href="#about">About</a></li>
-    <li><a href="#skills">Skills</a></li>
-    <li><a href="#projects">Projects</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
+<!-- Star Canvas -->
+<canvas id="starCanvas"></canvas>
+
+<!-- Shooting stars -->
+<div class="shooting-star" style="top:10%;left:20%;animation-duration:8s;animation-delay:2s;"></div>
+<div class="shooting-star" style="top:30%;left:50%;animation-duration:11s;animation-delay:5s;"></div>
+<div class="shooting-star" style="top:5%;left:70%;animation-duration:9s;animation-delay:8s;"></div>
+<div class="shooting-star" style="top:60%;left:10%;animation-duration:12s;animation-delay:3s;"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">IM</div>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#skills">Skills</a>
+    <a href="#projects">Projects</a>
+    <a href="#awards">Awards</a>
+    <a href="#contact">Contact</a>
+  </div>
 </nav>
 
+<main>
+<!-- ===== HERO ===== -->
 <section id="hero">
-  <canvas id="star-canvas"></canvas>
-  <canvas id="bokeh-canvas"></canvas>
-  <div class="divine-glow"></div>
-  <div class="divine-glow2"></div>
-  <div class="ov-grad"></div>
+  <!-- Mandala SVG background -->
+  <svg class="mandala-bg" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+    <g fill="none" stroke="#f5c842" stroke-width="0.5">
+      <circle cx="250" cy="250" r="240"/>
+      <circle cx="250" cy="250" r="220"/>
+      <circle cx="250" cy="250" r="180"/>
+      <circle cx="250" cy="250" r="140"/>
+      <circle cx="250" cy="250" r="100"/>
+      <circle cx="250" cy="250" r="60"/>
+      <circle cx="250" cy="250" r="20"/>
+      <!-- Petals -->
+      <ellipse cx="250" cy="130" rx="12" ry="30"/>
+      <ellipse cx="250" cy="130" rx="12" ry="30" transform="rotate(30 250 250)"/>
+      <ellipse cx="250" cy="130" rx="12" ry="30" transform="rotate(60 250 250)"/>
+      <ellipse cx="250" cy="130" rx="12" ry="30" transform="rotate(90 250 250)"/>
+      <ellipse cx="250" cy="130" rx="12" ry="30" transform="rotate(120 250 250)"/>
+      <ellipse cx="250" cy="130" rx="12" ry="30" transform="rotate(150 250 250)"/>
+      <ellipse cx="250" cy="130" rx="12" ry="30" transform="rotate(180 250 250)"/>
+      <ellipse cx="250" cy="130" rx="12" ry="30" transform="rotate(210 250 250)"/>
+      <ellipse cx="250" cy="130" rx="12" ry="30" transform="rotate(240 250 250)"/>
+      <ellipse cx="250" cy="130" rx="12" ry="30" transform="rotate(270 250 250)"/>
+      <ellipse cx="250" cy="130" rx="12" ry="30" transform="rotate(300 250 250)"/>
+      <ellipse cx="250" cy="130" rx="12" ry="30" transform="rotate(330 250 250)"/>
+      <!-- Outer petals -->
+      <ellipse cx="250" cy="60" rx="8" ry="22"/>
+      <ellipse cx="250" cy="60" rx="8" ry="22" transform="rotate(30 250 250)"/>
+      <ellipse cx="250" cy="60" rx="8" ry="22" transform="rotate(60 250 250)"/>
+      <ellipse cx="250" cy="60" rx="8" ry="22" transform="rotate(90 250 250)"/>
+      <ellipse cx="250" cy="60" rx="8" ry="22" transform="rotate(120 250 250)"/>
+      <ellipse cx="250" cy="60" rx="8" ry="22" transform="rotate(150 250 250)"/>
+      <ellipse cx="250" cy="60" rx="8" ry="22" transform="rotate(180 250 250)"/>
+      <ellipse cx="250" cy="60" rx="8" ry="22" transform="rotate(210 250 250)"/>
+      <ellipse cx="250" cy="60" rx="8" ry="22" transform="rotate(240 250 250)"/>
+      <ellipse cx="250" cy="60" rx="8" ry="22" transform="rotate(270 250 250)"/>
+      <ellipse cx="250" cy="60" rx="8" ry="22" transform="rotate(300 250 250)"/>
+      <ellipse cx="250" cy="60" rx="8" ry="22" transform="rotate(330 250 250)"/>
+      <!-- Lines -->
+      <line x1="250" y1="10" x2="250" y2="490"/>
+      <line x1="10" y1="250" x2="490" y2="250"/>
+      <line x1="10" y1="250" x2="490" y2="250" transform="rotate(45 250 250)"/>
+      <line x1="10" y1="250" x2="490" y2="250" transform="rotate(90 250 250)"/>
+      <line x1="10" y1="250" x2="490" y2="250" transform="rotate(135 250 250)"/>
+    </g>
+  </svg>
 
-  <!-- LEFT TEXT -->
-  <div class="hero-left">
-    <div class="otw" id="otw"><span class="otw-dot"></span>Open to Work</div>
-    <div style="overflow:hidden"><span class="hero-fn" id="hfn">Inchara</span></div>
-    <span class="hero-ln" id="hln">M &nbsp;·&nbsp; Full Stack Developer</span>
-    <p class="hero-role" id="hrole">
-      <strong>BCA 2026</strong> · PHP · Python · .NET · MySQL<br>
-      Machine Learning · Deployed live projects
-    </p>
-    <div class="hero-ctas" id="hcta">
-      <a class="btn-p" href="#projects">View Projects ↓</a>
-      <a class="btn-g" href="mailto:yadavinchara@gmail.com">Get in Touch</a>
-    </div>
-  </div>
-
-  <!-- RIGHT — MAHADEV + LAPTOP SCENE -->
-  <div class="mahadev-scene">
-    <svg class="scene-svg" viewBox="0 0 680 720" xmlns="http://www.w3.org/2000/svg">
+  <div class="trishul-container">
+    <!-- Trishul SVG -->
+    <svg class="trishul-svg" viewBox="0 0 100 200" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <radialGradient id="divineAura" cx="50%" cy="35%" r="55%">
-          <stop offset="0%" stop-color="rgba(255,107,26,0.18)"/>
-          <stop offset="40%" stop-color="rgba(245,200,66,0.08)"/>
-          <stop offset="100%" stop-color="transparent"/>
-        </radialGradient>
-        <radialGradient id="omGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="rgba(255,107,26,0.35)"/>
-          <stop offset="100%" stop-color="transparent"/>
-        </radialGradient>
-        <radialGradient id="lampGlow" cx="50%" cy="30%" r="60%">
-          <stop offset="0%" stop-color="rgba(255,160,50,0.5)"/>
-          <stop offset="100%" stop-color="transparent"/>
-        </radialGradient>
-        <radialGradient id="screenGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="rgba(62,207,178,0.22)"/>
-          <stop offset="100%" stop-color="transparent"/>
-        </radialGradient>
-        <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-        <filter id="softglow"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-        <filter id="bigblur"><feGaussianBlur stdDeviation="12"/></filter>
+        <linearGradient id="tg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#f5c842"/>
+          <stop offset="50%" stop-color="#ffaa00"/>
+          <stop offset="100%" stop-color="#ff6b2b"/>
+        </linearGradient>
       </defs>
-
-      <!-- ===== DIVINE BACKGROUND AURA ===== -->
-      <ellipse cx="340" cy="280" rx="260" ry="260" fill="url(#divineAura)"/>
-
-      <!-- DIVINE LIGHT RAYS emanating from top -->
-      <g opacity=".08">
-        <polygon class="ray r1" points="340,20 310,300 370,300" fill="var(--gold)"/>
-        <polygon class="ray r2" points="340,20 265,310 310,310" fill="var(--saffron)"/>
-        <polygon class="ray r3" points="340,20 370,300 415,310" fill="var(--gold)"/>
-        <polygon class="ray r4" points="340,20 230,320 275,320" fill="var(--saffron)"/>
-        <polygon class="ray r5" points="340,20 405,300 450,320" fill="var(--gold)"/>
-      </g>
-
-      <!-- ===== TRISHUL (top center, divine) ===== -->
-      <g class="trishul-shine" transform="translate(290,30)">
-        <!-- staff -->
-        <rect x="47" y="80" width="6" height="200" rx="3" fill="url(#trishulGrad,#gold2)" style="fill:#c8a030"/>
-        <!-- center prong -->
-        <path d="M50 30 Q50 10 50 0 L44 20 L50 35 L56 20 L50 0 Z" fill="#f5c842"/>
-        <path d="M50 30 L47 80 L53 80 Z" fill="#d4a820"/>
-        <!-- left prong -->
-        <path d="M30 50 Q20 30 22 15 L28 30 L35 50 Z" fill="#f5c842"/>
-        <path d="M35 50 L47 75 L43 78 Z" fill="#d4a820"/>
-        <!-- right prong -->
-        <path d="M70 50 Q80 30 78 15 L72 30 L65 50 Z" fill="#f5c842"/>
-        <path d="M65 50 L53 75 L57 78 Z" fill="#d4a820"/>
-        <!-- crossbar -->
-        <rect x="30" y="68" width="40" height="4" rx="2" fill="#e8b830"/>
-        <!-- trishul glow -->
-        <ellipse cx="50" cy="40" rx="20" ry="30" fill="rgba(245,200,66,0.12)" filter="url(#bigblur)"/>
-        <!-- damaru (drum) hanging -->
-        <path d="M38 100 Q50 112 62 100 Q60 115 50 120 Q40 115 38 100Z" fill="#8B4513" stroke="#c8a030" stroke-width="1.2"/>
-        <path d="M44 100 L44 120 M56 100 L56 120" stroke="#c8a030" stroke-width=".8"/>
-        <!-- beads on staff -->
-        <circle cx="50" cy="145" r="3" fill="#6B3A2A" stroke="#c8a030" stroke-width=".8"/>
-        <circle cx="50" cy="155" r="3" fill="#6B3A2A" stroke="#c8a030" stroke-width=".8"/>
-        <circle cx="50" cy="165" r="3" fill="#6B3A2A" stroke="#c8a030" stroke-width=".8"/>
-        <!-- base -->
-        <ellipse cx="50" cy="280" rx="14" ry="5" fill="#8B6914" opacity=".6"/>
-      </g>
-
-      <!-- ===== OM SYMBOL (large, glowing) ===== -->
-      <g class="om-glow" transform="translate(240,150)">
-        <!-- big soft glow behind om -->
-        <ellipse cx="100" cy="90" rx="75" ry="70" fill="url(#omGlow)" filter="url(#bigblur)" opacity=".6"/>
-        <!-- OM text -->
-        <text x="50" y="120"
-          font-family="serif" font-size="110" font-weight="900"
-          fill="none" stroke="rgba(245,200,66,0.55)" stroke-width="1.5"
-          text-anchor="middle"
-          style="text-anchor:middle">ॐ</text>
-        <text x="50" y="120"
-          font-family="serif" font-size="110" font-weight="900"
-          fill="rgba(255,107,26,0.2)"
-          text-anchor="middle"
-          style="text-anchor:middle">ॐ</text>
-      </g>
-
-      <!-- ===== RUDRAKSHA MALA ===== -->
-      <g class="rudraksha-chain" opacity=".75">
-        <!-- chain of beads in arc -->
-        <path d="M 160 320 Q 200 260 260 240 Q 320 225 380 240 Q 440 258 475 320" fill="none" stroke="#6B3A2A" stroke-width="2" stroke-dasharray="5,3"/>
-        <!-- beads along path -->
-        <circle cx="165" cy="318" r="5" fill="#5a2a1a" stroke="#c8a030" stroke-width="1"/>
-        <circle cx="185" cy="298" r="5" fill="#5a2a1a" stroke="#c8a030" stroke-width="1"/>
-        <circle cx="210" cy="280" r="5" fill="#5a2a1a" stroke="#c8a030" stroke-width="1"/>
-        <circle cx="238" cy="267" r="5" fill="#5a2a1a" stroke="#c8a030" stroke-width="1"/>
-        <circle cx="268" cy="256" r="5" fill="#5a2a1a" stroke="#c8a030" stroke-width="1"/>
-        <circle cx="300" cy="250" r="5" fill="#5a2a1a" stroke="#c8a030" stroke-width="1"/>
-        <circle cx="332" cy="250" r="5" fill="#5a2a1a" stroke="#c8a030" stroke-width="1"/>
-        <circle cx="363" cy="254" r="5" fill="#5a2a1a" stroke="#c8a030" stroke-width="1"/>
-        <circle cx="393" cy="264" r="5" fill="#5a2a1a" stroke="#c8a030" stroke-width="1"/>
-        <circle cx="420" cy="278" r="5" fill="#5a2a1a" stroke="#c8a030" stroke-width="1"/>
-        <circle cx="444" cy="296" r="5" fill="#5a2a1a" stroke="#c8a030" stroke-width="1"/>
-        <circle cx="463" cy="316" r="5" fill="#5a2a1a" stroke="#c8a030" stroke-width="1"/>
-      </g>
-
-      <!-- ===== DIYA / OIL LAMP (left) ===== -->
-      <g transform="translate(110,380)">
-        <ellipse cx="30" cy="40" rx="25" ry="8" fill="#c8a030" opacity=".4" filter="url(#bigblur)"/>
-        <!-- lamp body -->
-        <path d="M10 30 Q15 15 30 12 Q45 15 50 30 Q45 38 30 40 Q15 38 10 30Z" fill="#d4860a"/>
-        <path d="M10 30 Q15 38 30 40 Q45 38 50 30 L48 35 Q43 44 30 46 Q17 44 12 35Z" fill="#8B5E04"/>
-        <!-- oil -->
-        <ellipse cx="30" cy="29" rx="16" ry="6" fill="#f0a020" opacity=".5"/>
-        <!-- wick -->
-        <rect x="28" y="8" width="4" height="18" rx="2" fill="#4a3010"/>
-        <!-- flame -->
-        <g class="lamp-flame" style="transform-origin:30px 10px">
-          <ellipse cx="30" cy="6" rx="6" ry="14" fill="rgba(255,200,50,0.9)"/>
-          <ellipse cx="30" cy="4" rx="3" ry="9" fill="rgba(255,255,100,0.95)"/>
-          <ellipse cx="30" cy="2" rx="1.5" ry="5" fill="white" opacity=".9"/>
-        </g>
-        <!-- flame glow -->
-        <ellipse cx="30" cy="6" rx="18" ry="20" fill="url(#lampGlow)" filter="url(#bigblur)"/>
-        <!-- plate/thali -->
-        <ellipse cx="30" cy="42" rx="30" ry="7" fill="#8B6914" opacity=".7"/>
-        <!-- marigold petals around -->
-        <circle cx="8" cy="42" r="3" fill="#ff8c00" opacity=".7"/>
-        <circle cx="52" cy="42" r="3" fill="#ff6b1a" opacity=".7"/>
-        <circle cx="18" cy="48" r="2.5" fill="#ffb300" opacity=".6"/>
-        <circle cx="42" cy="48" r="2.5" fill="#ff8c00" opacity=".6"/>
-      </g>
-
-      <!-- ===== DIYA (right) ===== -->
-      <g transform="translate(510,380)">
-        <ellipse cx="30" cy="40" rx="25" ry="8" fill="#c8a030" opacity=".4" filter="url(#bigblur)"/>
-        <path d="M10 30 Q15 15 30 12 Q45 15 50 30 Q45 38 30 40 Q15 38 10 30Z" fill="#d4860a"/>
-        <path d="M10 30 Q15 38 30 40 Q45 38 50 30 L48 35 Q43 44 30 46 Q17 44 12 35Z" fill="#8B5E04"/>
-        <ellipse cx="30" cy="29" rx="16" ry="6" fill="#f0a020" opacity=".5"/>
-        <rect x="28" y="8" width="4" height="18" rx="2" fill="#4a3010"/>
-        <g class="lamp-flame" style="transform-origin:30px 10px;animation-delay:.3s">
-          <ellipse cx="30" cy="6" rx="6" ry="14" fill="rgba(255,200,50,0.9)"/>
-          <ellipse cx="30" cy="4" rx="3" ry="9" fill="rgba(255,255,100,0.95)"/>
-          <ellipse cx="30" cy="2" rx="1.5" ry="5" fill="white" opacity=".9"/>
-        </g>
-        <ellipse cx="30" cy="6" rx="18" ry="20" fill="url(#lampGlow)" filter="url(#bigblur)"/>
-        <ellipse cx="30" cy="42" rx="30" ry="7" fill="#8B6914" opacity=".7"/>
-        <circle cx="8" cy="42" r="3" fill="#ff8c00" opacity=".7"/>
-        <circle cx="52" cy="42" r="3" fill="#ff6b1a" opacity=".7"/>
-      </g>
-
-      <!-- ===== FLOATING FLOWER PETALS ===== -->
-      <g opacity=".6">
-        <ellipse class="petal p1" cx="180" cy="200" rx="5" ry="9" fill="#ff8c00" transform="rotate(30,180,200)"/>
-        <ellipse class="petal p2" cx="450" cy="180" rx="4" ry="8" fill="#ffb300" transform="rotate(-20,450,180)"/>
-        <ellipse class="petal p3" cx="280" cy="160" rx="4" ry="7" fill="#ff6b1a" transform="rotate(45,280,160)"/>
-        <ellipse class="petal p4" cx="400" cy="220" rx="5" ry="8" fill="#ff8c00" transform="rotate(-35,400,220)"/>
-        <ellipse class="petal p5" cx="340" cy="140" rx="3.5" ry="7" fill="#ffb300" transform="rotate(15,340,140)"/>
-      </g>
-
-      <!-- ===== DESK SURFACE ===== -->
-      <rect x="60" y="540" width="560" height="16" rx="6" fill="#14101e"/>
-      <rect x="60" y="540" width="560" height="2.5" rx="1" fill="rgba(255,255,255,0.06)"/>
-      <!-- desk legs -->
-      <rect x="90" y="556" width="14" height="80" rx="4" fill="#0e0c18"/>
-      <rect x="576" y="556" width="14" height="80" rx="4" fill="#0e0c18"/>
-
-      <!-- ===== SMALL SHIVLING on desk (left of laptop) ===== -->
-      <g transform="translate(100,460)">
-        <!-- base platform -->
-        <ellipse cx="35" cy="80" rx="32" ry="8" fill="#2a1e10" opacity=".8"/>
-        <!-- yoni (base oval) -->
-        <ellipse cx="35" cy="75" rx="28" ry="10" fill="#3a2818"/>
-        <rect x="10" y="60" width="50" height="15" rx="4" fill="#3a2818"/>
-        <!-- lingam -->
-        <ellipse cx="35" cy="60" rx="14" ry="16" fill="#4a3828"/>
-        <ellipse cx="35" cy="46" rx="10" ry="14" fill="#5a4030"/>
-        <ellipse cx="35" cy="35" rx="7" ry="9" fill="#6a4a38"/>
-        <!-- top round -->
-        <ellipse cx="35" cy="28" rx="6" ry="6" fill="#7a5a42"/>
-        <!-- water/milk dripping -->
-        <path d="M35 5 Q37 15 35 22" stroke="rgba(200,230,255,0.6)" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <!-- bilva leaves on top -->
-        <ellipse cx="29" cy="22" rx="5" ry="3" fill="#2a5a20" transform="rotate(-30,29,22)" opacity=".8"/>
-        <ellipse cx="35" cy="20" rx="5" ry="3" fill="#2a5a20" opacity=".8"/>
-        <ellipse cx="41" cy="22" rx="5" ry="3" fill="#2a5a20" transform="rotate(30,41,22)" opacity=".8"/>
-        <!-- marigold flowers -->
-        <circle cx="22" cy="75" r="4" fill="#ff8c00" opacity=".7"/>
-        <circle cx="48" cy="75" r="4" fill="#ff6b1a" opacity=".7"/>
-        <!-- glow -->
-        <ellipse cx="35" cy="50" rx="20" ry="28" fill="rgba(255,107,26,0.08)" filter="url(#bigblur)"/>
-      </g>
-
-      <!-- ===== LENOVO LAPTOP ===== -->
-      <!-- screen open -->
-      <g transform="translate(210,310) rotate(-1,220,130)">
-        <!-- lid back -->
-        <rect x="0" y="0" width="300" height="195" rx="9" fill="#16141e"/>
-        <!-- lenovo logo on lid -->
-        <text x="122" y="105" font-family="Arial,sans-serif" font-size="13" fill="rgba(255,255,255,0.1)" font-weight="bold" letter-spacing="3">Lenovo</text>
-        <!-- hinge -->
-        <rect x="0" y="190" width="300" height="5" rx="2" fill="#1e1c28"/>
-        <!-- bezel -->
-        <rect x="9" y="9" width="282" height="178" rx="6" fill="#0a0812"/>
-        <!-- screen -->
-        <rect class="screen-pulse" x="15" y="15" width="270" height="166" rx="4" fill="#0c1018"/>
-        <!-- screen glow overlay -->
-        <rect x="15" y="15" width="270" height="166" rx="4" fill="url(#screenGlow)" opacity=".6"/>
-        <!-- VS Code UI -->
-        <rect x="15" y="15" width="72" height="166" fill="#090d14" opacity=".9"/>
-        <!-- sidebar icons -->
-        <rect x="20" y="22" width="14" height="14" rx="3" fill="#1e1c2e" opacity=".8"/>
-        <rect x="20" y="40" width="14" height="14" rx="3" fill="#1e1c2e" opacity=".8"/>
-        <rect x="20" y="58" width="14" height="14" rx="3" fill="#1e1c2e" opacity=".8"/>
-        <!-- file tree -->
-        <rect x="38" y="22" width="42" height="2.5" rx="1" fill="rgba(245,200,66,.45)"/>
-        <rect x="42" y="30" width="30" height="2" rx="1" fill="rgba(255,255,255,.18)"/>
-        <rect x="42" y="37" width="36" height="2" rx="1" fill="rgba(62,207,178,.3)"/>
-        <rect x="42" y="44" width="28" height="2" rx="1" fill="rgba(255,255,255,.14)"/>
-        <rect x="42" y="51" width="34" height="2" rx="1" fill="rgba(245,200,66,.25)"/>
-        <rect x="42" y="58" width="25" height="2" rx="1" fill="rgba(155,127,232,.3)"/>
-        <!-- code area -->
-        <rect x="87" y="15" width="198" height="166" fill="#0c1018"/>
-        <!-- tab bar -->
-        <rect x="87" y="15" width="198" height="16" fill="#090c12"/>
-        <rect x="91" y="17" width="55" height="12" rx="2.5" fill="#182030"/>
-        <text x="100" y="26" font-family="JetBrains Mono,monospace" font-size="6" fill="rgba(62,207,178,.85)">index.php</text>
-        <rect x="150" y="17" width="45" height="12" rx="2.5" fill="#0d1018"/>
-        <text x="157" y="26" font-family="JetBrains Mono,monospace" font-size="6" fill="rgba(255,255,255,.25)">style.css</text>
-        <!-- code lines -->
-        <g class="cl1">
-          <text x="93" y="46" font-family="JetBrains Mono,monospace" font-size="7" fill="rgba(155,127,232,.9)">&lt;?php</text>
-          <text x="126" y="46" font-family="JetBrains Mono,monospace" font-size="7" fill="rgba(245,200,66,.85)"> echo "Dev";</text>
-        </g>
-        <g class="cl2">
-          <text x="93" y="57" font-family="JetBrains Mono,monospace" font-size="7" fill="rgba(62,207,178,.85)">$db</text>
-          <text x="110" y="57" font-family="JetBrains Mono,monospace" font-size="7" fill="rgba(255,255,255,.6)"> = </text>
-          <text x="122" y="57" font-family="JetBrains Mono,monospace" font-size="7" fill="rgba(240,168,117,.85)">"MySQL";</text>
-        </g>
-        <g class="cl3">
-          <text x="93" y="68" font-family="JetBrains Mono,monospace" font-size="7" fill="rgba(245,200,66,.8)">function</text>
-          <text x="133" y="68" font-family="JetBrains Mono,monospace" font-size="7" fill="rgba(255,255,255,.7)"> connect(){}</text>
-        </g>
-        <rect x="93" y="75" width="80" height="2.5" rx="1" fill="rgba(255,255,255,.06)"/>
-        <rect x="93" y="82" width="110" height="2.5" rx="1" fill="rgba(62,207,178,.07)"/>
-        <rect x="93" y="89" width="60" height="2.5" rx="1" fill="rgba(245,200,66,.07)"/>
-        <rect x="93" y="96" width="90" height="2.5" rx="1" fill="rgba(155,127,232,.07)"/>
-        <rect x="93" y="103" width="70" height="2.5" rx="1" fill="rgba(255,255,255,.05)"/>
-        <!-- cursor -->
-        <rect class="curs" x="93" y="111" width="2" height="8" rx="1" fill="rgba(245,200,66,.9)"/>
-        <!-- status bar -->
-        <rect x="87" y="167" width="198" height="14" fill="#090d18"/>
-        <text x="93" y="177" font-family="JetBrains Mono,monospace" font-size="5.5" fill="rgba(62,207,178,.65)">● PHP  UTF-8  Ln 42  Col 8</text>
-        <!-- red dot (thinkpad) -->
-        <circle cx="150" cy="12" r="2.2" fill="#cc2020" opacity=".8"/>
-      </g>
-
-      <!-- laptop base -->
-      <g transform="translate(205,500)">
-        <rect x="0" y="0" width="310" height="105" rx="8" fill="#14121e"/>
-        <!-- trackpad -->
-        <rect x="100" y="62" width="110" height="38" rx="5" fill="#0f0d1a" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-        <!-- trackpoint -->
-        <circle cx="155" cy="35" r="4" fill="#cc2020" opacity=".8">
-          <animate attributeName="opacity" values=".8;.45;.8" dur="3s" repeatCount="indefinite"/>
-        </circle>
-        <!-- Lenovo logo -->
-        <text x="118" y="92" font-family="Arial,sans-serif" font-size="8" fill="rgba(255,255,255,0.1)" font-weight="bold" letter-spacing="2">Lenovo</text>
-        <!-- keyboard -->
-        <g fill="#0e0c1a" stroke="rgba(255,255,255,0.07)" stroke-width=".4">
-          <rect x="8" y="8" width="16" height="10" rx="1.5"/><rect x="27" y="8" width="16" height="10" rx="1.5"/><rect x="46" y="8" width="16" height="10" rx="1.5"/><rect x="65" y="8" width="16" height="10" rx="1.5"/><rect x="84" y="8" width="16" height="10" rx="1.5"/><rect x="103" y="8" width="16" height="10" rx="1.5"/><rect x="122" y="8" width="16" height="10" rx="1.5"/><rect x="141" y="8" width="16" height="10" rx="1.5"/><rect x="160" y="8" width="16" height="10" rx="1.5"/><rect x="179" y="8" width="16" height="10" rx="1.5"/><rect x="198" y="8" width="16" height="10" rx="1.5"/><rect x="217" y="8" width="16" height="10" rx="1.5"/><rect x="236" y="8" width="24" height="10" rx="1.5"/>
-          <rect x="8" y="21" width="22" height="10" rx="1.5"/><rect x="33" y="21" width="16" height="10" rx="1.5"/><rect x="52" y="21" width="16" height="10" rx="1.5"/><rect x="71" y="21" width="16" height="10" rx="1.5"/><rect x="90" y="21" width="16" height="10" rx="1.5"/><rect x="109" y="21" width="16" height="10" rx="1.5"/><rect x="128" y="21" width="16" height="10" rx="1.5"/><rect x="147" y="21" width="16" height="10" rx="1.5"/><rect x="166" y="21" width="16" height="10" rx="1.5"/><rect x="185" y="21" width="16" height="10" rx="1.5"/><rect x="204" y="21" width="16" height="10" rx="1.5"/><rect x="223" y="21" width="37" height="10" rx="1.5"/>
-          <rect x="8" y="34" width="26" height="10" rx="1.5"/><rect x="37" y="34" width="16" height="10" rx="1.5"/><rect x="56" y="34" width="16" height="10" rx="1.5"/><rect x="75" y="34" width="16" height="10" rx="1.5"/><rect x="94" y="34" width="16" height="10" rx="1.5"/><rect x="113" y="34" width="16" height="10" rx="1.5"/><rect x="132" y="34" width="16" height="10" rx="1.5"/><rect x="151" y="34" width="16" height="10" rx="1.5"/><rect x="170" y="34" width="16" height="10" rx="1.5"/><rect x="189" y="34" width="16" height="10" rx="1.5"/><rect x="208" y="34" width="16" height="10" rx="1.5"/><rect x="227" y="34" width="33" height="10" rx="1.5" fill="#162012" stroke="rgba(62,207,178,.3)"/>
-          <rect x="8" y="47" width="16" height="10" rx="1.5"/><rect x="27" y="47" width="130" height="10" rx="1.5" fill="#141228"/><rect x="160" y="47" width="16" height="10" rx="1.5"/><rect x="179" y="47" width="16" height="10" rx="1.5"/><rect x="198" y="47" width="16" height="10" rx="1.5"/><rect x="217" y="47" width="43" height="10" rx="1.5"/>
-        </g>
-        <!-- random key flashes -->
-        <rect x="46" y="8" width="16" height="10" rx="1.5" fill="rgba(245,200,66,0.25)" opacity="0">
-          <animate attributeName="opacity" values="0;0;1;0;0;0;0;0;0;0" dur="1.8s" repeatCount="indefinite"/>
-        </rect>
-        <rect x="109" y="21" width="16" height="10" rx="1.5" fill="rgba(62,207,178,0.25)" opacity="0">
-          <animate attributeName="opacity" values="0;0;0;0;1;0;0;0;0;0" dur="2.2s" repeatCount="indefinite" begin=".5s"/>
-        </rect>
-        <rect x="132" y="34" width="16" height="10" rx="1.5" fill="rgba(155,127,232,0.3)" opacity="0">
-          <animate attributeName="opacity" values="0;0;0;0;0;0;1;0;0;0" dur="1.6s" repeatCount="indefinite" begin="1.1s"/>
-        </rect>
-      </g>
-
-      <!-- ===== BHASMA / ASH MARK subtle ===== -->
-      <!-- three lines symbol above laptop subtle -->
-      <g opacity=".15" transform="translate(290,285)">
-        <rect x="0" y="0" width="50" height="3" rx="1.5" fill="white"/>
-        <rect x="0" y="8" width="50" height="3" rx="1.5" fill="white"/>
-        <rect x="0" y="16" width="50" height="3" rx="1.5" fill="white"/>
-      </g>
-
-      <!-- ===== HAR HAR MAHADEV text ===== -->
-      <text x="340" y="700"
-        font-family="serif" font-size="16" font-weight="400"
-        fill="rgba(255,107,26,0.35)" text-anchor="middle"
-        letter-spacing="6" font-style="italic">
-        ॐ नमः शिवाय
-      </text>
-
-      <!-- sparkles -->
-      <text x="148" y="200" font-size="12" fill="rgba(245,200,66,.7)" style="animation:gspk 2.2s infinite ease-in-out">✦</text>
-      <text x="520" y="180" font-size="9" fill="rgba(255,107,26,.7)" style="animation:gspk 2.8s .7s infinite ease-in-out">✦</text>
-      <text x="540" y="360" font-size="8" fill="rgba(245,200,66,.6)" style="animation:gspk 2s 1.4s infinite ease-in-out">✦</text>
-      <text x="130" y="360" font-size="8" fill="rgba(255,160,50,.6)" style="animation:gspk 3s .3s infinite ease-in-out">✦</text>
-
-      <style>
-        @keyframes gspk{0%,100%{opacity:0;transform:scale(0)}50%{opacity:1;transform:scale(1)}}
-      </style>
+      <!-- Staff -->
+      <rect x="47" y="60" width="6" height="140" rx="3" fill="url(#tg)"/>
+      <!-- Central prong -->
+      <path d="M50 5 C50 5 42 25 42 45 C42 55 46 62 50 62 C54 62 58 55 58 45 C58 25 50 5 50 5Z" fill="url(#tg)"/>
+      <!-- Left prong -->
+      <path d="M28 18 C28 18 22 30 22 44 C22 52 26 58 30 58 C34 58 38 52 38 44 L42 50 L38 32 C35 25 30 18 28 18Z" fill="url(#tg)"/>
+      <!-- Right prong -->
+      <path d="M72 18 C72 18 78 30 78 44 C78 52 74 58 70 58 C66 58 62 52 62 44 L58 50 L62 32 C65 25 70 18 72 18Z" fill="url(#tg)"/>
+      <!-- Cross bar -->
+      <rect x="20" y="62" width="60" height="5" rx="2.5" fill="url(#tg)"/>
+      <!-- Rudrakshas on staff -->
+      <circle cx="50" cy="120" r="5" fill="url(#tg)" opacity="0.7"/>
+      <circle cx="50" cy="140" r="5" fill="url(#tg)" opacity="0.7"/>
+      <circle cx="50" cy="160" r="5" fill="url(#tg)" opacity="0.7"/>
+      <!-- Damaru hint -->
+      <ellipse cx="35" cy="108" rx="10" ry="6" fill="none" stroke="url(#tg)" stroke-width="1.5" opacity="0.6"/>
+      <ellipse cx="65" cy="108" rx="10" ry="6" fill="none" stroke="url(#tg)" stroke-width="1.5" opacity="0.6"/>
+      <line x1="45" y1="108" x2="55" y2="108" stroke="url(#tg)" stroke-width="1.5" opacity="0.6"/>
     </svg>
+    <div class="om-symbol">ॐ</div>
   </div>
 
-  <!-- scroll indicator -->
-  <div class="scroll-ind" id="scind">
-    <span class="scroll-txt">Scroll</span>
-    <div class="scroll-ln"></div>
+  <div class="hero-eyebrow">✦ Software Engineer · BCA 2026 ✦</div>
+  <h1>Inchara M</h1>
+  <div class="hero-title">Developer &nbsp;·&nbsp; Builder &nbsp;·&nbsp; Creator</div>
+  <p class="hero-quote">"Where there is a will, there is a way — every problem has a solution."</p>
+
+  <div class="hero-ctas">
+    <a href="#projects" class="btn-primary">View My Work</a>
+    <a href="#contact" class="btn-outline">Get In Touch</a>
   </div>
+
+  <div class="scroll-indicator">Scroll</div>
 </section>
 
-<!-- QUOTE -->
-<section id="quote">
-  <span class="q-om">ॐ</span>
-  <p class="q-main rev">Where there is a will,<br>there is a way.</p>
-  <p class="q-attr rev" data-d="1">— Inchara M <span class="q-line"></span></p>
-</section>
+<!-- DIVIDER -->
+<div class="divider">
+  <div class="divider-line"></div>
+  <div class="divider-symbol">✦</div>
+  <div class="divider-line"></div>
+</div>
 
-<!-- ABOUT -->
-<div class="divider"></div>
-<div class="section" id="about">
+<!-- ===== ABOUT ===== -->
+<div id="about">
+  <div class="section-header" style="text-align:center;margin-bottom:3rem;padding:0 2rem;">
+    <div class="section-eyebrow">Who I Am</div>
+    <h2>About Me</h2>
+  </div>
+
   <div class="about-grid">
-    <div>
-      <div class="sl rev">About</div>
-      <h2 class="st rev" data-d="1">I build things<br>that actually <em>ship.</em></h2>
-      <p class="atp rev" data-d="2">BCA student graduating 2026, specialising in full-stack web development, database management, and machine learning. Designed, built, and deployed the official college website end-to-end.</p>
-      <p class="atp rev" data-d="3">Two-time state-level competition winner. IBM-certified in Cyber Security. I ship real things to real users.</p>
-    </div>
-    <div class="sg rev" data-d="2">
-      <div class="sc"><div class="sn">10+</div><div class="sl2">Projects delivered</div></div>
-      <div class="sc"><div class="sn">2×</div><div class="sl2">State-level winner</div></div>
-      <div class="sc"><div class="sn">4</div><div class="sl2">Languages spoken</div></div>
-    </div>
-  </div>
-</div>
-
-<!-- SKILLS -->
-<div class="divider"></div>
-<div class="section" id="skills">
-  <div class="sl rev">Skills</div>
-  <h2 class="st rev" data-d="1">What I build <em>with</em></h2>
-  <div class="skrows">
-    <div class="skrow rev" data-d="1"><div class="skcat">Languages</div><div class="skpp"><span class="pill">PHP</span><span class="pill">JavaScript</span><span class="pill">Python</span><span class="pill">Java</span><span class="pill">C#</span><span class="pill">C/C++</span><span class="pill">HTML5</span><span class="pill">CSS3</span></div></div>
-    <div class="skrow rev" data-d="2"><div class="skcat">Backend & DB</div><div class="skpp"><span class="pill">MySQL</span><span class="pill">SQL Server</span><span class="pill">MongoDB</span><span class="pill">.NET</span><span class="pill">XAMPP</span><span class="pill">CRUD</span><span class="pill">REST APIs</span></div></div>
-    <div class="skrow rev" data-d="3"><div class="skcat">Deployment</div><div class="skpp"><span class="pill">cPanel</span><span class="pill">GoDaddy</span><span class="pill">Hostinger</span><span class="pill">GitHub Pages</span><span class="pill">DNS/SSL</span></div></div>
-    <div class="skrow rev" data-d="4"><div class="skcat">ML & Data</div><div class="skpp"><span class="pill">scikit-learn</span><span class="pill">Pandas</span><span class="pill">NumPy</span><span class="pill">Classification</span><span class="pill">F1-score</span><span class="pill">AUC-ROC</span></div></div>
-    <div class="skrow rev"><div class="skcat">Tools</div><div class="skpp"><span class="pill">Git & GitHub</span><span class="pill">VS Code</span><span class="pill">OOP</span><span class="pill">SDLC</span><span class="pill">Agile</span><span class="pill">Responsive Design</span></div></div>
-  </div>
-</div>
-
-<!-- PROJECTS -->
-<div class="divider"></div>
-<div class="section" id="projects">
-  <div class="sl rev">Work</div>
-  <h2 class="st rev" data-d="1">Projects I'm <em>proud of</em></h2>
-  <div class="pg">
-    <div class="pc w rev" data-d="1"><span class="pb bl">✓ Live</span><div class="ptt">Official College Website — J H Patel Institute</div><div class="pst">PHP · MySQL · HTML5 · CSS3 · cPanel · GoDaddy · Hostinger</div><ul class="pde"><li>Designed & deployed institution's website serving 1,000+ students — domain, DNS, SSL, PHP-MySQL backend.</li><li>Responsive CSS layouts; CMS for non-technical staff.</li></ul><a class="plnk" href="https://github.com/incharayadav20" target="_blank">View on GitHub →</a></div>
-    <div class="pc rev" data-d="2"><span class="pb bd">⚙ Deploying</span><div class="ptt">City Emergency Service System</div><div class="pst">PHP · MySQL · HTML5 · CSS3 · GitHub</div><ul class="pde"><li>Connecting citizens with police, fire & medical services.</li><li>Real-time requests, admin dashboard, case management.</li></ul></div>
-    <div class="pc rev" data-d="3"><span class="pb bk">Desktop App</span><div class="ptt">Banking Management System</div><div class="pst">.NET · C# · SQL Server · Windows Forms</div><ul class="pde"><li>Accounts, deposits, withdrawals & transaction history.</li><li>Indexed queries — response time ~40% faster.</li></ul></div>
-    <div class="pc w rev" data-d="2"><span class="pb bm">ML · 8+ Projects</span><div class="ptt">Python ML Portfolio</div><div class="pst">Python · scikit-learn · Pandas · NumPy · Classification</div><ul class="pde"><li>Pancreatic Cancer Prediction — Logistic Regression, Decision Tree, Random Forest; F1-score & AUC-ROC.</li><li>Disease prediction, benchmarking, data pipelines, mini web apps.</li></ul><a class="plnk" href="https://github.com/incharayadav20" target="_blank">All on GitHub →</a></div>
-  </div>
-</div>
-
-<!-- AWARDS -->
-<div class="divider"></div>
-<div class="section">
-  <div class="sl rev">Recognition</div>
-  <h2 class="st rev" data-d="1">Awards & <em>achievements</em></h2>
-  <div class="awl rev" data-d="2">
-    <div class="awr"><div class="awn">01</div><div class="awi">🏆</div><div><div class="awt">Winner — State Level Students Seminar, Pragna 4.0</div><div class="awd">1st place among BCA/BCS students statewide, judged on technical depth & presentation.</div></div></div>
-    <div class="awr"><div class="awn">02</div><div class="awi">🥇</div><div><div class="awt">Winner — Code Arena Competitive Coding Competition</div><div class="awd">1st place — fastest correct algorithmic solution under time pressure.</div></div></div>
-  </div>
-</div>
-
-<!-- CONTACT -->
-<div class="divider"></div>
-<div class="section" id="contact">
-  <div class="cg">
-    <div>
-      <div class="sl rev">Contact</div>
-      <h2 class="cbig rev" data-d="1">Let's build<br>something <em>great</em></h2>
-      <p class="csub rev" data-d="2">Actively seeking a full-stack or software engineering internship.</p>
-      <div class="cll rev" data-d="3">
-        <a class="cl" href="mailto:yadavinchara@gmail.com"><div class="cl-ic">✉</div><div><span class="cl-lb">Email</span><span class="cl-vl">yadavinchara@gmail.com</span></div></a>
-        <a class="cl" href="https://github.com/incharayadav20" target="_blank"><div class="cl-ic">⌥</div><div><span class="cl-lb">GitHub</span><span class="cl-vl">github.com/incharayadav20</span></div></a>
-        <a class="cl" href="https://www.linkedin.com/in/inchara-m-876925328/" target="_blank"><div class="cl-ic">↗</div><div><span class="cl-lb">LinkedIn</span><span class="cl-vl">linkedin.com/in/inchara-m</span></div></a>
+    <div class="about-visual">
+      <div class="avatar-ring">
+        <div class="avatar-inner">I</div>
+      </div>
+      <div class="stat-chips">
+        <div class="chip">
+          <span class="chip-label">Projects Built</span>
+          <span class="chip-value">10+</span>
+        </div>
+        <div class="chip">
+          <span class="chip-label">Languages Known</span>
+          <span class="chip-value">7+</span>
+        </div>
+        <div class="chip">
+          <span class="chip-label">Graduating</span>
+          <span class="chip-value">2026</span>
+        </div>
+        <div class="chip">
+          <span class="chip-label">Location</span>
+          <span class="chip-value">Davangere, KA</span>
+        </div>
       </div>
     </div>
-    <div class="acs rev" data-d="2">
-      <div class="ac"><div class="acl">Education</div><div class="aci"><strong>BCA — Computer Applications</strong><br>J H Patel Institute, Davangere · 2023–2026</div><div class="aci"><strong>Pre-University (PUC)</strong><br>Karnataka · 2022–2023</div></div>
-      <div class="ac"><div class="acl">Certifications</div><div class="aci"><strong>Cyber Security Fundamentals</strong> — IBM & ICT Academy</div><div class="aci"><strong>Diploma in PC Professional</strong> — Hardware & Networking</div></div>
-      <div class="ac"><div class="acl">Languages</div><div class="aci">Kannada (Native) · English (Professional)</div><div class="aci">Hindi (Conversational) · Telugu</div></div>
+    <div class="about-text">
+      <p>I'm a <strong>BCA student at J H Patel Institute of Management & Technology</strong>, graduating in 2026, with a deep passion for building software that solves real problems.</p>
+      <p>From web applications to machine learning, I've developed <strong>10+ projects</strong> across the full software development lifecycle — always with a focus on clean code, thoughtful design, and practical impact.</p>
+      <p>I'm proficient in <strong>PHP, Python, Java, C#, and .NET</strong>, with hands-on experience in database design, cloud hosting, and Agile workflows. Certified in <strong>Cyber Security Fundamentals by IBM & ICT Academy</strong>.</p>
+      <p>When I'm not coding, you'll find me sketching, writing poetry, or capturing nature through photography — a reminder that creativity powers everything I build.</p>
     </div>
   </div>
 </div>
 
+<!-- DIVIDER -->
+<div class="divider" style="margin-top:4rem;">
+  <div class="divider-line"></div>
+  <div class="divider-symbol">❋</div>
+  <div class="divider-line"></div>
+</div>
+
+<!-- ===== SKILLS ===== -->
+<section id="skills">
+  <div class="section-header">
+    <div class="section-eyebrow">What I Know</div>
+    <h2>Skills & Technologies</h2>
+  </div>
+
+  <div class="skills-cosmos">
+    <div class="skill-planet">
+      <div class="planet-icon">⚡</div>
+      <div class="planet-title">Languages</div>
+      <div class="skill-tags">
+        <span class="tag">PHP</span>
+        <span class="tag">Python</span>
+        <span class="tag">Java</span>
+        <span class="tag">C#</span>
+        <span class="tag">JavaScript</span>
+        <span class="tag">C / C++</span>
+      </div>
+    </div>
+
+    <div class="skill-planet">
+      <div class="planet-icon">🌐</div>
+      <div class="planet-title">Web & Backend</div>
+      <div class="skill-tags">
+        <span class="tag">HTML5</span>
+        <span class="tag">CSS3</span>
+        <span class="tag">PHP Backend</span>
+        <span class="tag">REST APIs</span>
+        <span class="tag">XAMPP</span>
+        <span class="tag">WAMP</span>
+      </div>
+    </div>
+
+    <div class="skill-planet">
+      <div class="planet-icon">🗄️</div>
+      <div class="planet-title">Databases</div>
+      <div class="skill-tags">
+        <span class="tag">MySQL</span>
+        <span class="tag">SQL Server</span>
+        <span class="tag">MongoDB</span>
+        <span class="tag">Schema Design</span>
+        <span class="tag">CRUD</span>
+        <span class="tag">Indexing</span>
+      </div>
+    </div>
+
+    <div class="skill-planet">
+      <div class="planet-icon">🤖</div>
+      <div class="planet-title">Machine Learning</div>
+      <div class="skill-tags">
+        <span class="tag">scikit-learn</span>
+        <span class="tag">Pandas</span>
+        <span class="tag">NumPy</span>
+        <span class="tag">Logistic Regression</span>
+        <span class="tag">Random Forest</span>
+        <span class="tag">AUC-ROC</span>
+      </div>
+    </div>
+
+    <div class="skill-planet">
+      <div class="planet-icon">🛠️</div>
+      <div class="planet-title">Tools & DevOps</div>
+      <div class="skill-tags">
+        <span class="tag">Git / GitHub</span>
+        <span class="tag">.NET</span>
+        <span class="tag">Visual Studio</span>
+        <span class="tag">cPanel</span>
+        <span class="tag">Hosting & DNS</span>
+        <span class="tag">SSL Setup</span>
+      </div>
+    </div>
+
+    <div class="skill-planet">
+      <div class="planet-icon">🧠</div>
+      <div class="planet-title">Core Concepts</div>
+      <div class="skill-tags">
+        <span class="tag">OOP</span>
+        <span class="tag">DSA</span>
+        <span class="tag">SDLC</span>
+        <span class="tag">Agile/Scrum</span>
+        <span class="tag">Unit Testing</span>
+        <span class="tag">Debugging</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIVIDER -->
+<div class="divider">
+  <div class="divider-line"></div>
+  <div class="divider-symbol">✦</div>
+  <div class="divider-line"></div>
+</div>
+
+<!-- ===== PROJECTS ===== -->
+<section id="projects">
+  <div class="section-header">
+    <div class="section-eyebrow">What I've Built</div>
+    <h2>Projects</h2>
+  </div>
+
+  <div class="projects-grid">
+    <div class="project-card">
+      <div class="project-number">01</div>
+      <div class="project-icon">🏥</div>
+      <div class="project-title">City Emergency Service System</div>
+      <div class="project-stack">
+        <span class="stack-tag">PHP</span>
+        <span class="stack-tag">MySQL</span>
+        <span class="stack-tag">HTML5</span>
+        <span class="stack-tag">GitHub</span>
+      </div>
+      <p class="project-desc">A multi-module web platform with citizen request forms, real-time admin dashboard, and MySQL-backed case tracking — full SDLC from requirements to deployment.</p>
+    </div>
+
+    <div class="project-card">
+      <div class="project-number">02</div>
+      <div class="project-icon">🏦</div>
+      <div class="project-title">Banking Management System</div>
+      <div class="project-stack">
+        <span class="stack-tag">.NET</span>
+        <span class="stack-tag">C#</span>
+        <span class="stack-tag">SQL Server</span>
+        <span class="stack-tag">Windows Forms</span>
+      </div>
+      <p class="project-desc">Desktop application with account management, transaction processing, and full history. Normalised SQL schema with indexed queries reduced response time by ~40%.</p>
+    </div>
+
+    <div class="project-card">
+      <div class="project-number">03</div>
+      <div class="project-icon">🔬</div>
+      <div class="project-title">Pancreatic Cancer Prediction</div>
+      <div class="project-stack">
+        <span class="stack-tag">Python</span>
+        <span class="stack-tag">scikit-learn</span>
+        <span class="stack-tag">Logistic Regression</span>
+        <span class="stack-tag">Random Forest</span>
+      </div>
+      <p class="project-desc">ML model to predict pancreatic cancer risk using Logistic Regression, Decision Tree, and Random Forest with F1-score and AUC-ROC evaluation on medical datasets.</p>
+    </div>
+
+    <div class="project-card">
+      <div class="project-number">04</div>
+      <div class="project-icon">🌐</div>
+      <div class="project-title">Web Hosting & Deployment</div>
+      <div class="project-stack">
+        <span class="stack-tag">cPanel</span>
+        <span class="stack-tag">GoDaddy</span>
+        <span class="stack-tag">Hostinger</span>
+        <span class="stack-tag">DNS & SSL</span>
+      </div>
+      <p class="project-desc">Hands-on experience deploying production websites end-to-end — DNS configuration, SSL certificates, cPanel management, and ensuring 100% cross-device compatibility.</p>
+    </div>
+
+    <div class="project-card">
+      <div class="project-number">05</div>
+      <div class="project-icon">🤖</div>
+      <div class="project-title">Python ML Portfolio</div>
+      <div class="project-stack">
+        <span class="stack-tag">Python</span>
+        <span class="stack-tag">Pandas</span>
+        <span class="stack-tag">NumPy</span>
+        <span class="stack-tag">scikit-learn</span>
+      </div>
+      <p class="project-desc">8+ machine learning systems covering disease prediction, data analysis, and model benchmarking. All projects available on GitHub with full documentation.</p>
+    </div>
+
+    <div class="project-card">
+      <div class="project-number">06</div>
+      <div class="project-icon">💻</div>
+      <div class="project-title">8+ Academic & Mini Projects</div>
+      <div class="project-stack">
+        <span class="stack-tag">Java</span>
+        <span class="stack-tag">C</span>
+        <span class="stack-tag">Python</span>
+        <span class="stack-tag">MySQL</span>
+      </div>
+      <p class="project-desc">Wide range of academic projects spanning database management, algorithms, OOP design patterns, and software application development across multiple languages.</p>
+    </div>
+  </div>
+</section>
+
+<!-- DIVIDER -->
+<div class="divider">
+  <div class="divider-line"></div>
+  <div class="divider-symbol">❋</div>
+  <div class="divider-line"></div>
+</div>
+
+<!-- ===== AWARDS ===== -->
+<section id="awards">
+  <div class="section-header">
+    <div class="section-eyebrow">Recognition</div>
+    <h2>Awards & Achievements</h2>
+  </div>
+
+  <div class="awards-row">
+    <div class="award-card">
+      <div class="award-icon">🏆</div>
+      <div>
+        <div class="award-title">State Level Seminar — Pragna 4.0</div>
+        <p class="award-desc">1st place among BCA/BCS students statewide, judged on technical depth and presentation quality. Competing across Karnataka.</p>
+      </div>
+    </div>
+    <div class="award-card">
+      <div class="award-icon">⚔️</div>
+      <div>
+        <div class="award-title">Code Arena — Coding Competition</div>
+        <p class="award-desc">1st place in competitive coding — fastest correct solution delivered under strict time pressure and constraints.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIVIDER -->
+<div class="divider">
+  <div class="divider-line"></div>
+  <div class="divider-symbol">✦</div>
+  <div class="divider-line"></div>
+</div>
+
+<!-- ===== CERTIFICATIONS ===== -->
+<section id="certifications">
+  <div class="section-header">
+    <div class="section-eyebrow">Credentials</div>
+    <h2>Certifications</h2>
+  </div>
+  <div class="cert-row">
+    <div class="cert-badge">
+      <span class="icon">🛡️</span>
+      <div>
+        <div class="text">Cyber Security Fundamentals</div>
+        <div class="issuer">IBM & ICT Academy</div>
+      </div>
+    </div>
+    <div class="cert-badge">
+      <span class="icon">🖥️</span>
+      <div>
+        <div class="text">Diploma in PC Professional</div>
+        <div class="issuer">Hardware & Networking</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIVIDER -->
+<div class="divider">
+  <div class="divider-line"></div>
+  <div class="divider-symbol">❋</div>
+  <div class="divider-line"></div>
+</div>
+
+<!-- ===== CONTACT ===== -->
+<section id="contact">
+  <div class="section-header">
+    <div class="section-eyebrow">Let's Connect</div>
+    <h2>Get In Touch</h2>
+  </div>
+  <p style="color:var(--muted);max-width:480px;margin:0 auto;line-height:1.8;font-size:0.95rem;">Open to software engineering internships, entry-level roles, and exciting collaborations. Let's build something great together.</p>
+  <div class="contact-grid">
+    <a href="mailto:yadavinchara@gmail.com" class="contact-item">
+      <span>✉️</span> yadavinchara@gmail.com
+    </a>
+    <a href="tel:+917676401629" class="contact-item">
+      <span>📞</span> +91 7676401629
+    </a>
+    <a href="https://github.com/incharayadav20" target="_blank" class="contact-item">
+      <span>🐙</span> github.com/incharayadav20
+    </a>
+    <a href="https://www.linkedin.com/in/inchara-yadav-876925328" target="_blank" class="contact-item">
+      <span>💼</span> LinkedIn Profile
+    </a>
+  </div>
+</section>
+</main>
+
 <footer>
-  <p style="font-size:1rem;margin-bottom:.4rem;opacity:.2">ॐ नमः शिवाय</p>
-  <p>© 2026 Inchara M &nbsp;·&nbsp; Davangere, Karnataka &nbsp;·&nbsp; <a href="mailto:yadavinchara@gmail.com">yadavinchara@gmail.com</a></p>
-  <p style="margin-top:.5rem;opacity:.25;font-style:italic">"Where there is a will, there is a way."</p>
+  <span class="footer-symbol">🔱</span>
+  Crafted with passion by Inchara M &nbsp;·&nbsp; Davangere, Karnataka &nbsp;·&nbsp; 2026
 </footer>
 
 <script>
-/* CURSOR */
-const cur=document.getElementById('cur'),cur2=document.getElementById('cur2');
-let mx=0,my=0,tx=0,ty=0;
-document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px'});
-(function a(){tx+=(mx-tx)*.12;ty+=(my-ty)*.12;cur2.style.left=tx+'px';cur2.style.top=ty+'px';requestAnimationFrame(a)})();
+// ===== STAR CANVAS =====
+const canvas = document.getElementById('starCanvas');
+const ctx = canvas.getContext('2d');
+let stars = [];
+let W, H;
 
-/* NAV */
-window.addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('scrolled',scrollY>60));
-
-/* STAR CANVAS */
-const sc=document.getElementById('star-canvas'),sx=sc.getContext('2d');
-let W,H;
-function rsz(){W=sc.width=window.innerWidth;H=sc.height=window.innerHeight}
-rsz();window.addEventListener('resize',rsz);
-const stars=Array.from({length:280},()=>({
-  x:Math.random(),y:Math.random(),sz:Math.random()*1.4+.2,
-  op:Math.random()*.6+.1,tw:Math.random()*.025+.005,ph:Math.random()*Math.PI*2,
-  c:['255,255,255','245,200,66','255,107,26','62,207,178'][Math.floor(Math.random()*4)]
-}));
-const shooters=[];
-function mks(){return{x:Math.random()*.5,y:Math.random()*.3,len:Math.random()*140+60,ang:Math.PI/5+Math.random()*.3,spd:.008,op:0,fade:false,active:false}}
-for(let i=0;i<3;i++)shooters.push(mks());
-let fr=0;
-function drawStars(){
-  sx.clearRect(0,0,W,H);fr++;
-  stars.forEach(s=>{s.ph+=s.tw;const op=s.op*(.55+.45*Math.sin(s.ph));sx.beginPath();sx.arc(s.x*W,s.y*H,s.sz,0,Math.PI*2);sx.fillStyle=`rgba(${s.c},${op})`;sx.fill()});
-  if(fr%260===0){const s=shooters.find(s=>!s.active);if(s){Object.assign(s,mks());s.active=true}}
-  shooters.forEach(s=>{
-    if(!s.active)return;
-    if(!s.fade)s.op=Math.min(1,s.op+.06);if(s.op>=1)s.fade=true;
-    if(s.fade)s.op-=.025;if(s.op<=0){s.active=false;return}
-    s.x+=Math.cos(s.ang)*s.spd;s.y+=Math.sin(s.ang)*s.spd;
-    sx.save();sx.translate(s.x*W,s.y*H);sx.rotate(s.ang);
-    const g=sx.createLinearGradient(0,0,s.len,0);
-    g.addColorStop(0,'rgba(255,107,26,0)');g.addColorStop(.7,`rgba(245,200,66,${s.op*.5})`);g.addColorStop(1,`rgba(255,255,255,${s.op})`);
-    sx.strokeStyle=g;sx.lineWidth=1.8;sx.beginPath();sx.moveTo(0,0);sx.lineTo(s.len,0);sx.stroke();sx.restore();
-  });
-  requestAnimationFrame(drawStars);
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
 }
-drawStars();
+resize();
+window.addEventListener('resize', resize);
 
-/* THREE.JS BOKEH */
-(function(){
-  const canvas=document.getElementById('bokeh-canvas');
-  const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:false});
-  renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
-  renderer.setClearColor(0,0);
-  const scene=new THREE.Scene();
-  const cam=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,1000);
-  cam.position.z=5;
-  function resize(){renderer.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()}
-  resize();window.addEventListener('resize',resize);
-  const N=150,geo=new THREE.BufferGeometry();
-  const pos=new Float32Array(N*3),col=new Float32Array(N*3),ph=new Float32Array(N),sp=new Float32Array(N);
-  const cols=[[1,.78,.26],[1,.42,.1],[1,1,1],[.24,.81,.7],[1,.65,.2]];
-  for(let i=0;i<N;i++){
-    pos[i*3]=(Math.random()-.5)*18;pos[i*3+1]=(Math.random()-.5)*12;pos[i*3+2]=(Math.random()-.5)*6;
-    const c=cols[Math.floor(Math.random()*cols.length)];
-    col[i*3]=c[0];col[i*3+1]=c[1];col[i*3+2]=c[2];
-    ph[i]=Math.random()*Math.PI*2;sp[i]=Math.random()*.004+.002;
+class Star {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.r = Math.random() * 1.8 + 0.2;
+    this.alpha = Math.random() * 0.8 + 0.1;
+    this.speed = Math.random() * 0.5 + 0.1;
+    this.twinkleSpeed = Math.random() * 0.02 + 0.005;
+    this.twinkleDir = Math.random() > 0.5 ? 1 : -1;
+    this.color = Math.random() > 0.85 ? '#f5c842' : (Math.random() > 0.7 ? '#a78bfa' : '#ffffff');
   }
-  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
-  geo.setAttribute('color',new THREE.BufferAttribute(col,3));
-  const mat=new THREE.PointsMaterial({size:.2,vertexColors:true,transparent:true,opacity:.5,blending:THREE.AdditiveBlending,depthWrite:false,sizeAttenuation:true});
-  scene.add(new THREE.Points(geo,mat));
-  let mx2=0,my2=0,t=0;
-  document.addEventListener('mousemove',e=>{mx2=(e.clientX/innerWidth-.5)*2;my2=(e.clientY/innerHeight-.5)*2});
-  (function anim(){
-    requestAnimationFrame(anim);t+=.007;
-    const p=geo.attributes.position.array;
-    for(let i=0;i<N;i++){p[i*3+1]+=Math.sin(t+ph[i])*sp[i];p[i*3]+=Math.cos(t*.5+ph[i])*sp[i]*.4}
-    geo.attributes.position.needsUpdate=true;
-    cam.position.x+=(mx2*.7-cam.position.x)*.028;
-    cam.position.y+=(-my2*.4-cam.position.y)*.028;
-    cam.lookAt(scene.position);
-    renderer.render(scene,cam);
-  })();
-})();
+  update() {
+    this.alpha += this.twinkleSpeed * this.twinkleDir;
+    if (this.alpha > 1) { this.alpha = 1; this.twinkleDir = -1; }
+    if (this.alpha < 0.05) { this.alpha = 0.05; this.twinkleDir = 1; }
+  }
+  draw() {
+    ctx.save();
+    ctx.globalAlpha = this.alpha;
+    ctx.fillStyle = this.color;
+    ctx.shadowColor = this.color;
+    ctx.shadowBlur = this.r > 1.2 ? 6 : 0;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
 
-/* GSAP */
-window.addEventListener('load',()=>{
-  const tl=gsap.timeline({delay:.2});
-  tl.to('#otw',{opacity:1,y:0,duration:.7,ease:'power3.out'})
-    .to('#hfn',{y:'0%',duration:1,ease:'power4.out'},'-=.3')
-    .to('#hln',{opacity:1,y:0,duration:.8,ease:'power3.out'},'-=.5')
-    .to('#hrole',{opacity:1,y:0,duration:.8,ease:'power3.out'},'-=.5')
-    .to('#hcta',{opacity:1,y:0,duration:.8,ease:'power3.out'},'-=.4')
-    .to('#scind',{opacity:1,duration:.6},'-=.3');
+// Special 4-point star
+class StarShape {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.size = Math.random() * 6 + 3;
+    this.alpha = Math.random() * 0.5 + 0.1;
+    this.twinkleSpeed = Math.random() * 0.015 + 0.005;
+    this.twinkleDir = 1;
+    this.rotation = Math.random() * Math.PI;
+    this.rotSpeed = (Math.random() - 0.5) * 0.02;
+  }
+  update() {
+    this.alpha += this.twinkleSpeed * this.twinkleDir;
+    if (this.alpha > 0.7) this.twinkleDir = -1;
+    if (this.alpha < 0.05) this.twinkleDir = 1;
+    this.rotation += this.rotSpeed;
+  }
+  draw() {
+    ctx.save();
+    ctx.globalAlpha = this.alpha;
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rotation);
+    ctx.strokeStyle = '#f5c842';
+    ctx.lineWidth = 1;
+    ctx.shadowColor = '#f5c842';
+    ctx.shadowBlur = 8;
+    const s = this.size;
+    ctx.beginPath();
+    ctx.moveTo(0, -s); ctx.lineTo(0, s);
+    ctx.moveTo(-s, 0); ctx.lineTo(s, 0);
+    // diagonals smaller
+    ctx.moveTo(-s*0.4, -s*0.4); ctx.lineTo(s*0.4, s*0.4);
+    ctx.moveTo(s*0.4, -s*0.4); ctx.lineTo(-s*0.4, s*0.4);
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+// Init stars
+for (let i = 0; i < 300; i++) stars.push(new Star());
+for (let i = 0; i < 25; i++) stars.push(new StarShape());
+
+function animate() {
+  ctx.clearRect(0, 0, W, H);
+  stars.forEach(s => { s.update(); s.draw(); });
+  requestAnimationFrame(animate);
+}
+animate();
+
+// ===== FLOATING PARTICLES =====
+function createParticle() {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  const size = Math.random() * 4 + 1;
+  const colors = ['#f5c842','#ff6b2b','#a855f7','#ffaa00','#ffffff'];
+  p.style.width = size + 'px';
+  p.style.height = size + 'px';
+  p.style.background = colors[Math.floor(Math.random() * colors.length)];
+  p.style.left = Math.random() * 100 + 'vw';
+  p.style.animationDuration = (Math.random() * 12 + 8) + 's';
+  p.style.animationDelay = (Math.random() * 8) + 's';
+  p.style.opacity = '0';
+  p.style.boxShadow = `0 0 ${size*3}px currentColor`;
+  document.body.appendChild(p);
+  setTimeout(() => p.remove(), 22000);
+}
+
+setInterval(createParticle, 600);
+
+// ===== SCROLL REVEAL =====
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.style.opacity = '1';
+      entry.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.project-card, .skill-planet, .award-card, .cert-badge').forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(30px)';
+  el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+  observer.observe(el);
 });
-
-/* SCROLL REVEAL */
-const revs=document.querySelectorAll('.rev');
-new IntersectionObserver(e=>e.forEach(el=>{if(el.isIntersecting)el.target.classList.add('on')}),{threshold:.1})
-  .observe && revs.forEach(r=>new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('on')}),{threshold:.1}).observe(r));
-
-document.getElementById('scind').addEventListener('click',()=>document.getElementById('quote').scrollIntoView({behavior:'smooth'}));
 </script>
 </body>
 </html>
